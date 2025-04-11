@@ -1,0 +1,50 @@
+services:
+  fastapi:
+    container_name: fastapi_app
+    build: .
+    command: >
+      sh -c "uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/fastapi-app
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    container_name: fastapi_postgres
+    image: postgres:16
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+
+  redis:
+    container_name: fastapi_redis
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  celery:
+    container_name: celery_worker
+    build: .
+    command: ["celery", "-A", "app.celery_worker", "worker", "--loglevel=info"]
+    volumes:
+      - .:/fastapi-app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+      - fastapi
+
+volumes:
+  postgres_data:
