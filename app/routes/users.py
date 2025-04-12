@@ -8,7 +8,7 @@ from sqlalchemy.future import select
 
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin, PasswordChange
+from app.schemas.user import UserCreate, UserLogin, PasswordChange, UserOut
 from app.utils.security import hash_password
 from app.utils.token import generate_tokens, get_current_user
 
@@ -90,3 +90,7 @@ async def change_password(
 
     return {"message": "Password changed successfully"}
 
+
+@router.get("/users/me", response_model=UserOut)
+async def get_user_details(current_user: User = Depends(get_current_user)):
+    return current_user
