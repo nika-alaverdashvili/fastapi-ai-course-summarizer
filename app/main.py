@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from app.routes import tasks
+from app.routes import tasks, users
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.db.redis import redis_client
@@ -30,4 +30,6 @@ async def ping_redis():
         return {"redis_connected": False, "error": str(e)}
 
 
+
+app.include_router(users.router, tags=["users"])
 app.include_router(tasks.router, tags=["tasks"])
