@@ -1,8 +1,9 @@
 import uuid
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime, timezone
 from app.db.base import Base
+from sqlalchemy import DateTime, func
+
 
 class User(Base):
     __tablename__ = "users"
@@ -11,4 +12,4 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    created_at = datetime.now(timezone.utc)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

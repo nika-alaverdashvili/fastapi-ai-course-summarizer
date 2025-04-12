@@ -3,12 +3,13 @@ services:
     container_name: fastapi_app
     build: .
     command: >
-      sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     restart: always
     ports:
       - "8000:8000"
     volumes:
       - .:/fastapi-app
+      - ./migrations:/fastapi-app/migrations
     env_file:
       - .env
     depends_on:
@@ -21,6 +22,7 @@ services:
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - ./migrations:/fastapi-app/migrations
     env_file:
       - .env
     ports:
@@ -39,6 +41,7 @@ services:
     command: ["celery", "-A", "app.celery_worker", "worker", "--loglevel=info"]
     volumes:
       - .:/fastapi-app
+      - ./migrations:/fastapi-app/migrations
     env_file:
       - .env
     depends_on:
