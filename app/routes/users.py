@@ -2,13 +2,13 @@ from fastapi import APIRouter, HTTPException, status, Depends, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.jwt import TokenResponse
-from app.utils.security import decode_token
+from app.utils.security import decode_token, verify_password
 
 from sqlalchemy.future import select
 
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserLogin
 from app.utils.security import hash_password
 from app.utils.token import generate_tokens
 
@@ -54,3 +54,19 @@ async def refresh_tokens(
 
     return generate_tokens(user=user)
 
+
+@router.post("/users/login", response_model=TokenResponse)
+async def login_user(
+    credentials: UserLogin,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Authenticate a user via email and password, then return JWT tokens.
+    """
+    result = await db.execute(select(User).where(User.email == str(credentials.email)))
+    user = result.scalar_one_or_none()
+
+    if not user or not verify_password(credentials.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    return generate_tokens(user=user)

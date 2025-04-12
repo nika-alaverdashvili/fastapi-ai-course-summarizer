@@ -18,11 +18,6 @@ class UserCreate(BaseModel):
     }
 
 
-class UserOut(BaseModel):
-    id: UUID
-    name: str
+class UserLogin(BaseModel):
     email: EmailStr
-
-    model_config = {
-        "from_attributes": True
-    }
+    password: str = Field(..., min_length=6)
