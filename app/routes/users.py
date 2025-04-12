@@ -8,9 +8,9 @@ from sqlalchemy.future import select
 
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin
+from app.schemas.user import UserCreate, UserLogin, PasswordChange
 from app.utils.security import hash_password
-from app.utils.token import generate_tokens
+from app.utils.token import generate_tokens, get_current_user
 
 router = APIRouter()
 
@@ -70,3 +70,23 @@ async def login_user(
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     return generate_tokens(user=user)
+
+
+@router.post("/users/change-password", status_code=200)
+async def change_password(
+    data: PasswordChange,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Allow an authenticated user to change their password.
+    """
+    if not verify_password(data.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=401, detail="Current password is incorrect")
+
+    current_user.hashed_password = hash_password(data.new_password)
+    db.add(current_user)
+    await db.commit()
+
+    return {"message": "Password changed successfully"}
+
