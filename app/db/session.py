@@ -18,3 +18,5 @@ async def get_db() -> AsyncGenerator[Any, Any]:
     """Dependency injection for db!"""
     async with AsyncSessionLocal() as session:
         yield session
+
+async_session = AsyncSessionLocal

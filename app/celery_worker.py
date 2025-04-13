@@ -4,16 +4,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
 celery = Celery(
-    "worker",
+    "app",
     broker=REDIS_URL,
     backend=REDIS_URL
 )
 
-# test
-@celery.task
-def add(x, y):
-    return x + y
+celery.autodiscover_tasks(["app"])
