@@ -42,6 +42,22 @@ async def get_all_courses(
     return result.scalars().all()
 
 
+@router.get("/courses/{course_id}", response_model=CourseOut)
+async def get_course(
+    course_id: UUID = Path(..., description="The UUID of the course to retrieve"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = await db.execute(
+        select(Course).where(Course.id == course_id, Course.user_id == current_user.id)
+    )
+    course = result.scalar_one_or_none()
+
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    return course
+
 
 @router.post("/generate_summary", status_code=status.HTTP_202_ACCEPTED)
 async def generate_summary(
