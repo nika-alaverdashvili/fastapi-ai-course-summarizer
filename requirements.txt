@@ -36,3 +36,6 @@ email-validator==2.2.0
 alembic==1.15.2
 passlib==1.7.4
 PyJWT==2.10.1
+openai==1.73.0
+httpx==0.28.1
+psycopg2-binary==2.9.10
