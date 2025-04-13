@@ -20,3 +20,8 @@ class CourseOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CourseSummaryGenerate(BaseModel):
+    course_id: UUID
+    new_description: str
