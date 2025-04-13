@@ -40,3 +40,8 @@ openai==1.73.0
 httpx==0.28.1
 psycopg2-binary==2.9.10
 limits==4.7.3
+
+# packages for pre-commit
+flake8==7.1.1
+isort==5.13.2
+black==24.10.0

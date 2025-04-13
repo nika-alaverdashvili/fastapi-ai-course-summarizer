@@ -1,0 +1,8 @@
+[flake8]
+max-line-length = 95
+
+# Exclude compiled files, migrations, and Alembic config
+exclude =
+  __pycache__,
+  */migrations/*,
+  alembic.ini
