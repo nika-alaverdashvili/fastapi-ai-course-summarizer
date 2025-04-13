@@ -25,3 +25,8 @@ class CourseOut(BaseModel):
 class CourseSummaryGenerate(BaseModel):
     course_id: UUID
     new_description: str
+
+
+class ManualSummaryUpdate(BaseModel):
+    course_id: UUID
+    new_summary: str = Field(..., min_length=10, max_length=2000)
