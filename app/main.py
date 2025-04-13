@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Depends
-from app.routes import users, courses
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.session import get_db
-from app.db.redis import redis_client
+from fastapi import Depends, FastAPI
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.db.redis import redis_client
+from app.db.session import get_db
+from app.routes import courses, users
 
 app = FastAPI()
 
@@ -28,7 +28,6 @@ async def ping_redis():
         return {"redis_connected": value == "ok"}
     except Exception as e:
         return {"redis_connected": False, "error": str(e)}
-
 
 
 app.include_router(users.router, tags=["users"])

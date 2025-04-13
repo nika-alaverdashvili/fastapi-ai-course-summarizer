@@ -1,21 +1,20 @@
-from fastapi import APIRouter, HTTPException, status, Depends, Body
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.schemas.jwt import TokenResponse
-from app.utils.security import decode_token, verify_password
-
 from sqlalchemy.future import select
 
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin, PasswordChange, UserOut
-from app.utils.security import hash_password
+from app.schemas.jwt import TokenResponse
+from app.schemas.user import PasswordChange, UserCreate, UserLogin, UserOut
+from app.utils.security import decode_token, hash_password, verify_password
 from app.utils.token import generate_tokens, get_current_user
 
 router = APIRouter()
 
 
-@router.post("/users", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/users", response_model=TokenResponse, status_code=status.HTTP_201_CREATED
+)
 async def register_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     """
     Register a new user and return access + refresh tokens.
@@ -27,7 +26,7 @@ async def register_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     new_user = User(
         name=user.name,
         email=str(user.email),
-        hashed_password=hash_password(user.password)
+        hashed_password=hash_password(user.password),
     )
     db.add(new_user)
     await db.commit()
@@ -38,8 +37,7 @@ async def register_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
 
 @router.post("/users/refresh", response_model=TokenResponse)
 async def refresh_tokens(
-    refresh_token: str = Body(..., embed=True),
-    db: AsyncSession = Depends(get_db)
+    refresh_token: str = Body(..., embed=True), db: AsyncSession = Depends(get_db)
 ):
     """
     Verify the provided refresh token and return new access and refresh tokens.
@@ -76,7 +74,7 @@ async def login_user(
 async def change_password(
     data: PasswordChange,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     """
     Allow an authenticated user to change their password.

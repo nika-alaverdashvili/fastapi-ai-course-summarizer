@@ -1,4 +1,5 @@
 import logging
+
 from app.db.session_sync import SessionLocal
 from app.models.course import Course
 from app.openai_service import generate_course_summary_sync

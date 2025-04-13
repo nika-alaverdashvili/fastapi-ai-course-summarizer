@@ -32,12 +32,18 @@ def create_token(data: dict, expires_delta: timedelta, token_type: str) -> str:
 def decode_token(token: str, expected_type: str) -> TokenPayload:
     """Decode and validate a JWT token. Raise error if invalid or expired."""
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
         token_data = TokenPayload(**payload)
     except (PyJWTError, ValueError):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token"
+        )
 
     if token_data.token_type != expected_type:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token type")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token type"
+        )
 
     return token_data

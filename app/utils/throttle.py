@@ -1,6 +1,6 @@
+from fastapi import HTTPException, status
 from limits import RateLimitItemPerDay
 from limits.storage import MemoryStorage
-from fastapi import HTTPException, status
 
 rate_limit = RateLimitItemPerDay(3)
 storage = MemoryStorage()
@@ -15,8 +15,10 @@ def check_throttle(user_id: str):
     """
     key = f"generate_summary:{user_id}"
 
-    if not storage.acquire_entry(key, rate_limit.amount, expiry=rate_limit.get_expiry()):
+    if not storage.acquire_entry(
+        key, rate_limit.amount, expiry=rate_limit.get_expiry()
+    ):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="You have exceeded the daily limit of 3 summaries. Try again tomorrow."
+            detail="You have exceeded the daily limit of 3 summaries. Try again tomorrow.",
         )

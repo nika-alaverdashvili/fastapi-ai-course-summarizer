@@ -1,18 +1,25 @@
 from typing import List
 from uuid import UUID
 
-from app.db.session import get_db
-from app.models.course import Course
-from app.schemas.course import CourseCreate, CourseOut, CourseSummaryGenerate, ManualSummaryUpdate
-from app.utils.throttle import check_throttle
-from app.utils.token import get_current_user
-from app.models.user import User
-from fastapi import APIRouter, Depends, HTTPException, status, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.db.session import get_db
+from app.models.course import Course
+from app.models.user import User
+from app.schemas.course import (
+    CourseCreate,
+    CourseOut,
+    CourseSummaryGenerate,
+    ManualSummaryUpdate,
+)
 from app.tasks.task import generate_summary_task
+from app.utils.throttle import check_throttle
+from app.utils.token import get_current_user
+
 router = APIRouter()
+
 
 @router.post("/courses", response_model=CourseOut, status_code=status.HTTP_201_CREATED)
 async def create_course(
@@ -34,7 +41,7 @@ async def create_course(
         user_id=current_user.id,
         course_title=course_data.course_title,
         course_description=course_data.course_description,
-        status="pending"
+        status="pending",
     )
     db.add(new_course)
     await db.commit()
@@ -56,7 +63,9 @@ async def generate_summary(
     check_throttle(str(current_user.id))
 
     result = await db.execute(
-        select(Course).where(Course.id == data.course_id, Course.user_id == current_user.id)
+        select(Course).where(
+            Course.id == data.course_id, Course.user_id == current_user.id
+        )
     )
     course = result.scalar_one_or_none()
 
@@ -84,9 +93,7 @@ async def get_all_courses(
     Returns:
         List[CourseOut]: A list of the user's courses.
     """
-    result = await db.execute(
-        select(Course).where(Course.user_id == current_user.id)
-    )
+    result = await db.execute(select(Course).where(Course.user_id == current_user.id))
     return result.scalars().all()
 
 
@@ -141,7 +148,9 @@ async def update_course_summary(
         :param db:
     """
     result = await db.execute(
-        select(Course).where(Course.id == data.course_id, Course.user_id == current_user.id)
+        select(Course).where(
+            Course.id == data.course_id, Course.user_id == current_user.id
+        )
     )
     course = result.scalar_one_or_none()
 
@@ -189,4 +198,3 @@ async def delete_course(
 
     await db.delete(course)
     await db.commit()
-

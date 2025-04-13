@@ -13,7 +13,7 @@ class UserCreate(BaseModel):
             "example": {
                 "name": "John Doe",
                 "email": "john@example.com",
-                "password": "secure password"
+                "password": "secure password",
             }
         }
     }

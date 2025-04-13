@@ -1,10 +1,10 @@
 import uuid
-from sqlalchemy import Column, String
+
+from sqlalchemy import Column, DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
-from sqlalchemy import DateTime, func
 
 
 class User(Base):
@@ -16,4 +16,6 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    courses = relationship("Course", back_populates="user", cascade="all, delete-orphan")
+    courses = relationship(
+        "Course", back_populates="user", cascade="all, delete-orphan"
+    )

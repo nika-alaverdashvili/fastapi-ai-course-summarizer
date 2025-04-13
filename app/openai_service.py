@@ -1,21 +1,27 @@
-import httpx
 import logging
+
+import httpx
+
 from app.settings import settings
 
 logger = logging.getLogger(__name__)
 OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"
 
+
 def generate_course_summary_sync(course_description: str) -> str:
     headers = {
         "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
 
     data = {
         "model": settings.OPENAI_MODEL,
         "messages": [
-            {"role": "user", "content": f"Summarize this online course: {course_description}"}
-        ]
+            {
+                "role": "user",
+                "content": f"Summarize this online course: {course_description}",
+            }
+        ],
     }
 
     for attempt in range(3):
