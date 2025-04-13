@@ -4,6 +4,7 @@ from uuid import UUID
 from app.db.session import get_db
 from app.models.course import Course
 from app.schemas.course import CourseCreate, CourseOut, CourseSummaryGenerate
+from app.utils.throttle import check_throttle
 from app.utils.token import get_current_user
 from app.models.user import User
 from fastapi import APIRouter, Depends, HTTPException, status, Path
@@ -65,6 +66,13 @@ async def generate_summary(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    """
+    Triggers background task to generate AI summary for a course.
+    Limited to 3 uses per user per day.
+    """
+
+    check_throttle(str(current_user.id))
+
     result = await db.execute(
         select(Course).where(Course.id == data.course_id, Course.user_id == current_user.id)
     )

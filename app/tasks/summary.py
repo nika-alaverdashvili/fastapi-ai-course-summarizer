@@ -21,7 +21,6 @@ def generate_and_store_summary(course_id: str, description: str):
                 logger.warning(f"[DB] Course not found: {course_id}")
                 return
 
-            # ✅ Always update summary and status
             course.ai_summary = summary
             course.status = "completed"
             session.commit()
