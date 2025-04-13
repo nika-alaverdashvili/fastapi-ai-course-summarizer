@@ -1,10 +1,12 @@
+from typing import List
+from uuid import UUID
 
 from app.db.session import get_db
 from app.models.course import Course
 from app.schemas.course import CourseCreate, CourseOut, CourseSummaryGenerate
 from app.utils.token import get_current_user
 from app.models.user import User
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -27,6 +29,18 @@ async def create_course(
     await db.commit()
     await db.refresh(new_course)
     return new_course
+
+
+@router.get("/courses", response_model=List[CourseOut])
+async def get_all_courses(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = await db.execute(
+        select(Course).where(Course.user_id == current_user.id)
+    )
+    return result.scalars().all()
+
 
 
 @router.post("/generate_summary", status_code=status.HTTP_202_ACCEPTED)
