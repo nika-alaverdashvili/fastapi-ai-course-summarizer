@@ -93,4 +93,9 @@ async def change_password(
 
 @router.get("/users/me", response_model=UserOut)
 async def get_user_details(current_user: User = Depends(get_current_user)):
+    """
+    Retrieve the details of the currently authenticated user.
+
+    Returns the user's profile information.
+    """
     return current_user
